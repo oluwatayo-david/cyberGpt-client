@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useUser } from '@clerk/clerk-react';
 import './ChatList.css';
 import { useQuery } from "@tanstack/react-query";
+import { useAuth } from '@clerk/clerk-react';
 import { Menu, X } from 'react-feather';
 import Logo from '/public/logo.png';
 import { ThreeDots } from "react-loader-spinner";
@@ -10,14 +11,24 @@ import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/clerk-reac
 import Contactpage from '../../../routes/contactpage/contactpage';
 
 const ChatList = () => {
+  const { getToken } = useAuth();
+
   const { isPending, error, data } = useQuery({
     queryKey: ["userChats"],
-    queryFn: () =>
-      fetch(`${import.meta.env.VITE_API_URL}/api/userchats`, {
+    queryFn: async () => {
+      const token = await getToken();
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/userchats`, {
+        headers: { Authorization: `Bearer ${token}` },
         credentials: "include",
-      }).then((res) => res.json()),
-  });
+      });
 
+      if (!res.ok) {
+        throw new Error('Network response error')
+      }
+      return response.json();
+    },
+  });
+  
   const {pathname} = useLocation();
   const [activePath, setActivePath] = useState(pathname); // Use pathname for active state
   const { user } = useUser();
@@ -53,7 +64,7 @@ const ChatList = () => {
             <Link
               to="/"
               onClick={() => setActivePath("/")}
-              className={`hover:text-white ${isActive("/") ? "bg-[#2c2937]" : ""}`}
+              className={`hover:text-white ${isActive("/") ? "bg-[#2c2937]" : ""} my-1`}
             >
               Explore CyberGpt
             </Link>
@@ -78,7 +89,7 @@ const ChatList = () => {
                 ) : error ? (
                   <div className="text-red-500">Something went wrong!</div>
                 ) : (
-                  data?.map((chat) => (
+                  data?.slice().reverse().map((chat) => (
                     <Link
                       to={`/dashboard/chats/${chat._id}`}
                       key={chat._id}
@@ -133,7 +144,7 @@ const ChatList = () => {
             <Link
               to="/"
               onClick={() => setActivePath("/")}
-              className={`hover:text-white ${isActive("/") ? "bg-[#2c2937]" : ""}`}
+              className={`hover:text-white ${isActive("/") ? "bg-[#2c2937]" : ""} my-1`}
             >
               Explore CyberGpt
             </Link>
