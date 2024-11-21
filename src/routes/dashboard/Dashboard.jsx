@@ -6,23 +6,27 @@ const DashboardPage = () => {
 
   const navigate = useNavigate();
  console.log(import.meta.env.VITE_API_URL)
-  const mutation = useMutation({
-    mutationFn: (text) => {
-      return fetch(`${import.meta.env.VITE_API_URL}/api/chats`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ text }),
-      }).then((res) => res.json());
-    },
-    onSuccess: (id) => {
-      // Invalidate and refetch
-      queryClient.invalidateQueries({ queryKey: ["userChats"] });
-      navigate(`/dashboard/chats/${id}`);
-    },
-  });
+ const mutation = useMutation({
+  mutationFn: (text) => {
+    return fetch(`${import.meta.env.VITE_API_URL}/api/chats`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text }),
+    }).then((res) => {
+      if (!res.ok) throw new Error("Failed to create chat");
+      return res.json();
+    });
+  },
+  onSuccess: (id) => {
+    queryClient.invalidateQueries({ queryKey: ["userChats"] });
+    navigate(`/dashboard/chats/${id}`);
+  },
+  onError: (error) => {
+    console.error("Error creating chat:", error);
+    alert("Failed to create chat. Please try again.");
+  },
+});
 
   const handleSubmit = async (e) => {
     e.preventDefault();
