@@ -10,6 +10,8 @@ import model from "../lib/gemini";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { ThreeDots } from "react-loader-spinner";
+import { useAuth } from '@clerk/clerk-react';
+
 
 
 const NewPrompt = ({ data }) => {
@@ -49,25 +51,46 @@ const NewPrompt = ({ data }) => {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: () => {
-      return fetch(`${import.meta.env.VITE_API_URL}/api/chats/${data._id}`, {
-        method: "PUT",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          question: question.length ? question : undefined,
-          answer,
-          img: img.dbData?.filePath || undefined,
-        }),
-      }).then((res) => res.json());
+
+    mutationFn: async () => {
+      const { getToken } = useAuth()
+      
+      try {
+        const token = await getToken();
+        if (!token) {
+          throw new Error("Authentication token is missing");
+        }
+  
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/chats/${data._id}`, {
+          method: "PUT",
+          credentials: "include",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            question: question.length ? question : undefined,
+            answer,
+            img: img.dbData?.filePath || undefined,
+          }),
+        });
+  
+        if (!response.ok) {
+          throw new Error(`Failed to update chat: ${response.statusText}`);
+        }
+  
+        return response.json();
+      } catch (error) {
+        console.error("Error in fetch:", error);
+        throw error; // Pass the error to `onError` for better logging
+      }
     },
     onSuccess: () => {
       queryClient
         .invalidateQueries({ queryKey: ["chat", data._id] })
         .then(() => {
-          formRef.current.reset(); // reset form
+          // Reset form and state
+          formRef.current.reset();
           setQuestion("");
           setAnswer("");
           setImg({
@@ -76,13 +99,17 @@ const NewPrompt = ({ data }) => {
             dbData: {},
             aiData: {},
           });
+        })
+        .catch((error) => {
+          console.error("Error invalidating queries:", error);
         });
     },
     onError: (err) => {
-      console.log(err);
+      console.error("Error updating chat:", err);
+      alert("Failed to update chat. Please try again.");
     },
   });
-
+  
   const add = async (text, isInitial) => {
     if (!isInitial) setQuestion(text);
     setIsLoadingResponse(true);

@@ -1,31 +1,50 @@
 import React from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from '@clerk/clerk-react';
 const DashboardPage = () => {
   const queryClient = useQueryClient();
+  const { getToken } = useAuth()
 
   const navigate = useNavigate();
- const mutation = useMutation({
-  mutationFn: (text) => {
-    return fetch(`${import.meta.env.VITE_API_URL}/api/chats`, {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text }),
-    }).then((res) => {
-      if (!res.ok) throw new Error("Failed to create chat");
-      return res.json();
-    });
-  },
-  onSuccess: (id) => {
-    queryClient.invalidateQueries({ queryKey: ["userChats"] });
-    navigate(`/dashboard/chats/${id}`);
-  },
-  onError: (error) => {
-    console.error("Error creating chat:", error);
-    alert("Failed to create chat. Please try again.");
-  },
-});
+  const mutation = useMutation({
+    mutationFn: async (text) => {
+      try {
+        const token = await getToken();
+        if (!token) {
+          throw new Error("Authentication token is missing");
+        }
+
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/chats`, {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ text }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to create chat: ${response.statusText}`);
+        }
+
+        return response.json();
+      } catch (error) {
+        console.error("Error in fetch:", error);
+        throw error; // Pass the error to `onError` handler.
+      }
+    },
+    onSuccess: (id) => {
+      queryClient.invalidateQueries({ queryKey: ["userChats"] });
+      navigate(`/dashboard/chats/${id}`); // Ensure `data.id` matches your API's response structure.
+    },
+    onError: (error) => {
+      console.error("Error creating chat:", error);
+      alert("Failed to create chat. Please try again.");
+    },
+  });
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
