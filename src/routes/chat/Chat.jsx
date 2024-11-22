@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import NewPrompt from "../../components/NewPrompt";
 import { useQuery } from "@tanstack/react-query";
+import { useAuth } from '@clerk/clerk-react';
 import { useLocation } from "react-router-dom";
 import Markdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -17,15 +18,22 @@ const ChatPage = () => {
   const chatId = path.split("/").pop();
   const [copiedMessageId, setCopiedMessageId] = useState(null); // Track which message was copied
   const [copiedCodeId, setCopiedCodeId] = useState(null); // Track which code block was copied
-
+  const { getToken } = useAuth();
   const { isPending, error, data } = useQuery({
     queryKey: ["chat", chatId],
-    queryFn: () =>
-      fetch(`${import.meta.env.VITE_API_URL}/api/chats/${chatId}`, {
+    queryFn: async () => {
+      const token = await getToken();
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/chats/${chatId}`, {
+        headers: { Authorization: `Bearer ${token}` },
         credentials: "include",
-      }).then((res) => res.json()),
-  });
+      });
 
+      if (!res.ok) {
+        throw new Error('Network response error')
+      }
+      return response.json();
+    },
+  });
   const handleCopy = (messageId, text) => {
     setCopiedMessageId(messageId);
     navigator.clipboard.writeText(text);
@@ -62,7 +70,7 @@ const ChatPage = () => {
           {/* Copy button for code blocks */}
           <button
             onClick={() => handleCopyCode(node.position.start.line, codeText)}
-            className="absolute top-2 right-2 text-sm px-2 py-1 rounded bg-gray-600 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+            className="absolute px-2 py-1 text-sm text-white transition-opacity bg-gray-600 rounded opacity-0 top-2 right-2 group-hover:opacity-100"
           >
             {copiedCodeId === node.position.start.line ? "Copied!" : "Copy code"}
           </button>
@@ -134,7 +142,7 @@ const ChatPage = () => {
                     {message.role !== "user" && (
                      <div > <button
                      onClick={() => handleCopy(i, message.parts[0].text)}
-                     className="bottom-0 left-1 text-sm px-2 py-1 rounded  text-white opacity-0 group-hover:opacity-100 transition-opacity "
+                     className="bottom-0 px-2 py-1 text-sm text-white transition-opacity rounded opacity-0 left-1 group-hover:opacity-100 "
                    >
                  <img
             src={
