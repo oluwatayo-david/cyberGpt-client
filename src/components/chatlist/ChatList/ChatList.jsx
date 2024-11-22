@@ -19,6 +19,7 @@ const ChatList = () => {
       const token = await getToken();
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/userchats`, {
         headers: { Authorization: `Bearer ${token}` },
+        credentials: "include",
       });
 
       if (!res.ok) {
