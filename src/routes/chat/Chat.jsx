@@ -28,12 +28,14 @@ const ChatPage = () => {
         credentials: "include",
       });
 
-      if (!res.ok) {
-        throw new Error('Network response error')
+      if (!response.ok) {
+        throw new Error("Network response error");
       }
+
       return response.json();
     },
   });
+
   const handleCopy = (messageId, text) => {
     setCopiedMessageId(messageId);
     navigator.clipboard.writeText(text);

@@ -5,7 +5,6 @@ const DashboardPage = () => {
   const queryClient = useQueryClient();
 
   const navigate = useNavigate();
- console.log(import.meta.env.VITE_API_URL)
  const mutation = useMutation({
   mutationFn: (text) => {
     return fetch(`${import.meta.env.VITE_API_URL}/api/chats`, {
