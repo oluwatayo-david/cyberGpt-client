@@ -83,24 +83,26 @@ const ChatList = () => {
             </span>
             <div className="flex overflow-y-scroll h-72 scrollbar-hidden">
               <div className="flex flex-col w-full gap-1 list">
-                {isPending ? (
-                  <div className="flex items-center justify-center w-full h-full">
-                    <ThreeDots height="80" width="80" color="#605e68" ariaLabel="loading" />
-                  </div>
-                ) : error ? (
-                  <div className="text-red-500">Something went wrong!</div>
-                ) : (
-                  data?.slice().reverse().map((chat) => (
-                    <Link
-                      to={`/dashboard/chats/${chat._id}`}
-                      key={chat._id}
-                      onClick={() => setActivePath(`/dashboard/chats/${chat._id}`)}
-                      className={`hover:text-white ${isActive(`/dashboard/chats/${chat._id}`) ? "bg-[#2c2937]" : ""}`}
-                    >
-                      {truncateText(chat.title, 27)}
-                    </Link>
-                  ))
-                )}
+              {isPending ? (
+      <div className="flex items-center justify-center w-full h-full">
+        <ThreeDots height="80" width="80" color="#605e68" ariaLabel="loading" />
+      </div>
+    ) : error ? (
+      <div className="text-red-500">Something went wrong!</div>
+    ) : data && data.length === 0 ? (
+      <div className="text-gray-500">start a new chat 😊.</div>
+    ) : (
+      data?.slice().reverse().map((chat) => (
+        <Link
+          to={`/dashboard/chats/${chat._id}`}
+          key={chat._id}
+          onClick={() => setActivePath(`/dashboard/chats/${chat._id}`)}
+          className={`hover:text-white ${isActive(`/dashboard/chats/${chat._id}`) ? "bg-[#2c2937]" : ""}`}
+        >
+          {truncateText(chat.title, 27)}
+        </Link>
+      ))
+    )}
               </div>
             </div>
           </div>
@@ -162,24 +164,26 @@ const ChatList = () => {
             </span>
             <div className="flex overflow-hidden h-60">
               <div className="flex flex-col w-full gap-1 overflow-scroll list scrollbar-hidden">
-                {isPending ? (
-                  <div className="flex items-center justify-center w-full h-full">
-                    <ThreeDots height="80" width="80" color="#605e68" ariaLabel="loading" />
-                  </div>
-                ) : error ? (
-                  <div className="text-red-500">Something went wrong!</div>
-                ) : (
-                  data?.map((chat) => (
-                    <Link
-                      to={`/dashboard/chats/${chat._id}`}
-                      key={chat._id}
-                      onClick={() => setActivePath(`/dashboard/chats/${chat._id}`)}
-                      className={`hover:text-white ${isActive(`/dashboard/chats/${chat._id}`) ? "bg-[#2c2937]" : ""}`}
-                    >
-                      {truncateText(chat.title, 27)}
-                    </Link>
-                  ))
-                )}
+              {isPending ? (
+      <div className="flex items-center justify-center w-full h-full">
+        <ThreeDots height="80" width="80" color="#605e68" ariaLabel="loading" />
+      </div>
+    ) : error ? (
+      <div className="text-red-500">Something went wrong!</div>
+    ) : data && data.length === 0 ? (
+      <div className="text-gray-500">Start a new chat 😊.</div>
+    ) : (
+      data?.slice().reverse().map((chat) => (
+        <Link
+          to={`/dashboard/chats/${chat._id}`}
+          key={chat._id}
+          onClick={() => setActivePath(`/dashboard/chats/${chat._id}`)}
+          className={`hover:text-white ${isActive(`/dashboard/chats/${chat._id}`) ? "bg-[#2c2937]" : ""}`}
+        >
+          {truncateText(chat.title, 27)}
+        </Link>
+      ))
+    )}
               </div>
             </div>
             <hr className="h-1 border-none bg-[#ddd] opacity-[0.1] rounded-[5px] my-5 mx-0" />
