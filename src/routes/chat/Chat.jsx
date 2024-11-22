@@ -21,10 +21,19 @@ const ChatPage = () => {
   const { getToken } = useAuth();
   const { isPending, error, data } = useQuery({
     queryKey: ["chat", chatId],
-    queryFn: () => 
-      fetch(`${import.meta.env.VITE_API_URL}/api/chats/${chatId}`, {
+    queryFn: async () => {
+      const token = await getToken();
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/chats/${chatId}`, {
+        headers: { Authorization: `Bearer ${token}` },
         credentials: "include",
-      }).then((res) => res.json()),
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response error");
+      }
+
+      return response.json();
+    },
   });
 
   const handleCopy = (messageId, text) => {
