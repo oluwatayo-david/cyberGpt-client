@@ -15,7 +15,7 @@ const NewPrompt = ({ data }) => {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [isLoadingResponse, setIsLoadingResponse] = useState(false);
-  const [isStopped, setIsStopped] = useState(false); // New state for stopping response
+  const [isStopped, setIsStopped] = useState(false); // Added state to handle stopping
   const [img, setImg] = useState({
     isLoading: false,
     error: "",
@@ -35,7 +35,7 @@ const NewPrompt = ({ data }) => {
 
   const endRef = useRef(null);
   const formRef = useRef(null);
-  const abortControllerRef = useRef(null); // Ref to manage AbortController
+  const abortControllerRef = useRef(null); // AbortController ref to handle stopping
 
   useEffect(() => {
     endRef.current.scrollIntoView({ behavior: "smooth" });
@@ -88,16 +88,16 @@ const NewPrompt = ({ data }) => {
 
     setIsLoadingResponse(true);
     setIsStopped(false);
-    abortControllerRef.current = new AbortController();
+    abortControllerRef.current = new AbortController(); // Create a new controller for each request
 
     try {
       const result = await chat.sendMessageStream(
         Object.entries(img.aiData).length ? [img.aiData, text] : [text],
-        { signal: abortControllerRef.current.signal }
+        { signal: abortControllerRef.current.signal } // Pass signal to handle stopping
       );
       let accumulatedText = "";
       for await (const chunk of result.stream) {
-        if (isStopped) break; // Stop the response if requested
+        if (isStopped) break; // Stop the response if the user requests
         const chunkText = chunk.text();
         accumulatedText += chunkText;
         setAnswer(accumulatedText);
@@ -114,16 +114,18 @@ const NewPrompt = ({ data }) => {
   };
 
   const handleStop = () => {
-    setIsStopped(true);
-    abortControllerRef.current?.abort(); // Abort the stream
+    setIsStopped(true); // Stop state
+    abortControllerRef.current?.abort(); // Abort the ongoing stream
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const text = e.target.text.value;
+    const text = e.target.text.value.trim();
     if (!text) return;
 
-    add(text, false);
+    setQuestion(text);
+    setAnswer(""); // Clear previous answer
+    add(text, false); // Trigger response
   };
 
   const renderers = {
