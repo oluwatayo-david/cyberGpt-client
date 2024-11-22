@@ -47,13 +47,13 @@ const NewPrompt = ({ data }) => {
   useEffect(() => {
     endRef.current.scrollIntoView({ behavior: "smooth" });
   }, [data, question, answer, img.dbData]);
-
+  const { getToken } = useAuth()
   const queryClient = useQueryClient();
+
 
   const mutation = useMutation({
 
     mutationFn: async () => {
-      const { getToken } = useAuth()
       
       try {
         const token = await getToken();
@@ -152,7 +152,7 @@ const NewPrompt = ({ data }) => {
     } else {
       setIsNewChat(false); // Existing chat
     }
-  }, [data]);
+  }, [data, add]);
 
   {/**used to render code blocks response  from ai*/ }
   const renderers = {
