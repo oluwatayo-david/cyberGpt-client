@@ -152,7 +152,7 @@ const NewPrompt = ({ data }) => {
     } else {
       setIsNewChat(false); // Existing chat
     }
-  }, [data, add]);
+  }, [data]);
 
   {/**used to render code blocks response  from ai*/ }
   const renderers = {
