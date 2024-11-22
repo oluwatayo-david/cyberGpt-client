@@ -16,7 +16,7 @@ const Homepage = () => {
 
         <h2>Make everyday worth living</h2>
         <h3 className="font-extrabold lg:max-w-[70%] max-w-full ">
-          CyberGpt is a smart chat bot  powered by gemini
+          CyberGpt is a smart chat bot  powered by gemini AI
         </h3>
         <Link to="/dashboard" className="px-5 py-4 text-white rounded-full bg-getStartedButton text-[14px] mt-10 hover:bg-white hover:text-[#217bfe] mb-10 lg:mb-0 ">Get Started</Link>
       </div>
