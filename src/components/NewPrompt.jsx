@@ -192,7 +192,7 @@ const NewPrompt = ({ data }) => {
       <div className="pb-24 endChat" ref={endRef}></div>
 
       <form
-        className="absolute bottom-0 md:w-1/2 newForm bg-[#2c2937] rounded-lg flex items-center px-5 w-full"
+        className="md:absolute bottom-0 fixed left-0 right-0 md:w-1/2 newForm bg-[#2c2937] rounded-lg flex items-center px-5 w-full"
         onSubmit={handleSubmit}
         ref={formRef}
       >
