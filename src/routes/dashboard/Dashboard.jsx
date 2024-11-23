@@ -78,8 +78,8 @@ const DashboardPage = () => {
           </div>
         </div>
       </div>
-      <div className="md:w-1/2 lg:mt-auto  bg-[#2c2937] rounded-md flex  w-full ">
-        <form  className="flex items-center justify-between w-full h-full gap-5 mb-2 " onSubmit={handleSubmit}>
+      <div className="md:w-1/2 lg:mt-auto  bg-[#2c2937] rounded-md flex  w-full fixed left-0 right-0 bottom-0">
+        <form  className="flex items-center justify-between w-full  h-full gap-5 mb-2 " onSubmit={handleSubmit}>
           <input type="text" name="text" placeholder="Ask me anything..."  className="flex-1 p-3 bg-transparent border-none outline-none text-[#ececec]"/>
           <button className="bg-gray-500 rounded-[50%] border-none cursor-pointer p-2 flex items-center justify-center mr-5">
             <img src="/arrow.png" alt=""  className="w-4 h-4"/>
