@@ -229,8 +229,12 @@ const NewPrompt = ({ data }) => {
       )}
 
       <div className="pb-24 endChat" ref={endRef}></div>
-     
-      <form className="absolute bottom-0 md:w-1/2 newForm bg-[#2c2937] rounded-lg flex items-center  px-5 w-full" onSubmit={handleSubmit} ref={formRef}>
+
+      <form
+        className="absolute bottom-0 md:w-1/2 newForm bg-[#2c2937] rounded-lg flex items-center px-5 w-full"
+        onSubmit={handleSubmit}
+        ref={formRef}
+      >
         <Upload setImg={setImg} />
         <input id="file" type="file" multiple={false} hidden className="inputs" />
         <input type="text" name="text" placeholder="Ask anything..." className="inputs" />
